@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prevenção de Incêndios Florestais</title>
+  <style>
+    html, body {
+      padding: 0;
+      margin: 0;
+      height: 100%;
+      background: #000;           /* faixas pretas quando a janela não é 16:9 */
+      overflow: hidden;
+    }
+    body {
+      display: flex;              /* centra o canvas na janela */
+      justify-content: center;
+      align-items: center;
+    }
+    canvas {
+      /* o canvas continua a ser 1920 x 1080, só é mostrado maior ou menor.
+         A largura é a menor entre: toda a janela, ou a que cabe na altura (16:9) */
+      width: min(100vw, 177.78vh) !important;
+      height: auto !important;
+    }
+  </style>
+
+  <script src="p5/p5.js"></script>
+  <script src="p5/sound/p5.sound.js"></script>
+
+  <!-- Um ficheiro por ecrã. Os próximos serão acrescentados aqui. -->
+  <script src="menu.js"></script>
+  <!-- <script src="calibracao.js"></script> -->
+  <!-- <script src="execucao.js"></script> -->
+  <!-- <script src="resultado.js"></script> -->
+
+  <!-- O sketch.js fica sempre em último: é ele que liga os ecrãs -->
+  <script src="sketch.js"></script>
+</head>
+
+<body></body>
+
+</html>
