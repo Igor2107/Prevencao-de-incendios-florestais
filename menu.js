@@ -3,7 +3,7 @@
 // -- menu.js - Prevenção de Incêndios Florestais
 // -- Menu de informação com cartões interativos
 // -- Canvas de 1920 x 1080
-// -- -------------------------------------------------------
+// -- ---------------------------------------------------------
 
 let nuvens = [];
 let arvoresMenu = [];
