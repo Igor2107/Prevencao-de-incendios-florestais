@@ -1,16 +1,12 @@
-
-// -- -------------------------------------------------------
-// -- menu.js - Prevenção de Incêndios Florestais
-// -- Menu de informação com cartões interativos
-// -- Canvas de 1920 x 1080
-// -- ---------------------------------------------------------
+// ==========================================
+// MENU - PREVENÇÃO DE INCÊNDIOS FLORESTAIS
+// Canvas: 1920 x 1080
+// ==========================================
 
 let nuvens = [];
 let arvoresMenu = [];
-
 let animacaoCartoes = [];
 let inicioAnimacaoCartoes = 0;
-
 let paginaCartoes = 0;
 let cartoesPorPagina = 4;
 
@@ -19,7 +15,6 @@ let bannerY = 245;
 let bannerW = 1800;
 let bannerH = 250;
 
-// -- Cartões informativos
 let cartoes = [
     {
         titulo: ["Limpeza de matos"],
@@ -144,33 +139,26 @@ let cartoes = [
     }
 ];
 
-// -- Dimensões dos cartões
 let cartaoW = 380;
 let cartaoH = 260;
 let cartaoY = 520;
 let cartaoGap = 20;
 
-// -- Área reservada para as setas
-let margemSetas = 100;
-
-// -- Botão do quiz
 let botaoW = 360;
 let botaoH = 76;
 let botaoX = 780;
 let botaoY = 935;
 
-// -- Setas: ficam nas margens, fora dos cartões
 let setaEsq = { x: 25, y: 610, w: 50, h: 65 };
 let setaDir = { x: 1845, y: 610, w: 50, h: 65 };
 
-// -- Cartão selecionado
 let cartaoSelecionado = -1;
 
 
-// -- -------------------------------------------------------
-// -- Posição dos cartões
-// -- Reserva espaço para as setas dos dois lados
-// -- -------------------------------------------------------
+// ==========================================
+// POSIÇÃO DOS CARTÕES
+// ==========================================
+
 function posicaoCartao(posicao) {
     let larguraTotal =
         cartoesPorPagina * cartaoW +
@@ -178,13 +166,15 @@ function posicaoCartao(posicao) {
 
     let margemEsquerda = (width - larguraTotal) / 2;
 
-    return margemEsquerda + posicao * (cartaoW + cartaoGap);
+    return margemEsquerda +
+        posicao * (cartaoW + cartaoGap);
 }
 
 
-// -- -------------------------------------------------------
-// -- iniciarMenu
-// -- -------------------------------------------------------
+// ==========================================
+// INICIAR MENU
+// ==========================================
+
 function iniciarMenu() {
     inicioAnimacaoCartoes = millis();
     paginaCartoes = 0;
@@ -219,9 +209,10 @@ function iniciarMenu() {
 }
 
 
-// -- -------------------------------------------------------
-// -- desenharMenu
-// -- -------------------------------------------------------
+// ==========================================
+// DESENHAR MENU
+// ==========================================
+
 function desenharMenu() {
     background(255, 247, 220);
 
@@ -242,9 +233,10 @@ function desenharMenu() {
 }
 
 
-// -- -------------------------------------------------------
-// -- CABEÇALHO
-// -- -------------------------------------------------------
+// ==========================================
+// CABEÇALHO
+// ==========================================
+
 function desenharCabecalho() {
     noStroke();
     fill(40, 110, 50);
@@ -253,7 +245,11 @@ function desenharCabecalho() {
     textFont(fonteBold);
     textSize(44);
 
-    text("Prevenção de Incêndios Florestais", 60, 70);
+    text(
+        "Prevenção de Incêndios Florestais",
+        60,
+        70
+    );
 
     stroke(40, 110, 50);
     strokeWeight(2);
@@ -261,18 +257,22 @@ function desenharCabecalho() {
 
     noStroke();
     textSize(40);
-    text("Aprende a prevenir incêndios e a proteger pessoas, casas e florestas.", 60, 165);
+
+    text(
+        "Aprende a prevenir incêndios e a proteger pessoas, casas e florestas.",
+        60,
+        165
+    );
 
     textFont(fonteNormal);
     textSize(30);
-
- 
 }
 
 
-// -- -------------------------------------------------------
-// -- BANNER DA FLORESTA
-// -- -------------------------------------------------------
+// ==========================================
+// BANNER DA FLORESTA
+// ==========================================
+
 function desenharBanner() {
     stroke(40, 110, 50);
     strokeWeight(4);
@@ -301,6 +301,7 @@ function desenharBanner() {
     }
 
     fill(120, 190, 90);
+
     rect(
         bannerX,
         bannerY + bannerH - 50,
@@ -323,15 +324,15 @@ function desenharBanner() {
 }
 
 
-// -- -------------------------------------------------------
-// -- CARTÕES ANIMADOS
-// -- -------------------------------------------------------
+// ==========================================
+// CARTÕES ANIMADOS
+// ==========================================
+
 function desenharCartao(i, posicao) {
     let x = posicaoCartao(posicao);
     let c = cartoes[i];
     let a = animacaoCartoes[i];
 
-    // Entrada progressiva
     let atraso = posicao * 180;
 
     let progresso = constrain(
@@ -345,7 +346,6 @@ function desenharCartao(i, posicao) {
 
     let deslocamentoY = 60 * (1 - entrada);
 
-    // Detetar rato sobre o cartão
     let centroX = x + cartaoW / 2;
     let centroY =
         cartaoY + cartaoH / 2 +
@@ -374,13 +374,11 @@ function desenharCartao(i, posicao) {
 
     scale(1 + 0.045 * a.hover);
 
-    // Sombra
     drawingContext.save();
     drawingContext.shadowColor = "rgba(20,70,25,0.25)";
     drawingContext.shadowBlur = 18 * a.hover;
     drawingContext.shadowOffsetY = 5 * a.hover;
 
-    // Fundo e borda
     stroke(40, 110, 50);
     strokeWeight(4);
 
@@ -398,10 +396,10 @@ function desenharCartao(i, posicao) {
     );
 
     drawingContext.restore();
-    noStroke();
 
-    // Título
+    noStroke();
     fill(30, 80, 35);
+
     textAlign(LEFT);
     textFont(fonteBold);
     textSize(30);
@@ -414,7 +412,6 @@ function desenharCartao(i, posicao) {
         );
     }
 
-    // Descrição
     textFont(fonteNormal);
     textSize(23);
 
@@ -426,7 +423,6 @@ function desenharCartao(i, posicao) {
         );
     }
 
-    // Indicação de mais informação
     fill(35, 100, 45);
     textFont(fonteBold);
     textSize(18);
@@ -441,9 +437,10 @@ function desenharCartao(i, posicao) {
 }
 
 
-// -- -------------------------------------------------------
-// -- SETAS DE NAVEGAÇÃO
-// -- -------------------------------------------------------
+// ==========================================
+// SETAS DE NAVEGAÇÃO
+// ==========================================
+
 function desenharSetas() {
     desenharSeta(setaEsq, "‹", paginaCartoes > 0);
     desenharSeta(setaDir, "›", paginaCartoes < 1);
@@ -475,9 +472,10 @@ function desenharSeta(s, simbolo, ativa) {
 }
 
 
-// -- -------------------------------------------------------
-// -- INDICADOR DE PÁGINA
-// -- -------------------------------------------------------
+// ==========================================
+// INDICADOR DE PÁGINA
+// ==========================================
+
 function desenharIndicadorPagina() {
     fill(40, 100, 45);
     textAlign(CENTER);
@@ -494,13 +492,13 @@ function desenharIndicadorPagina() {
 }
 
 
-// -- -------------------------------------------------------
-// -- TEXTO FINAL
-// -- -------------------------------------------------------
+// ==========================================
+// TEXTO FINAL
+// ==========================================
+
 function desenharTextosFinais() {
     fill(30, 90, 40);
     textAlign(CENTER);
-
     textFont(fonteBold);
     textSize(29);
 
@@ -523,9 +521,10 @@ function desenharTextosFinais() {
 }
 
 
-// -- -------------------------------------------------------
-// -- BOTÃO DO QUIZ
-// -- -------------------------------------------------------
+// ==========================================
+// BOTÃO DO QUIZ
+// ==========================================
+
 function ratoSobreBotao() {
     return (
         mouseX > botaoX &&
@@ -549,7 +548,6 @@ function desenharBotaoQuiz() {
 
     noStroke();
     fill(255);
-
     textAlign(CENTER);
     textFont(fonteBold);
     textSize(38);
@@ -564,16 +562,16 @@ function desenharBotaoQuiz() {
 }
 
 
-// -- -------------------------------------------------------
-// -- CLIQUES
-// -- -------------------------------------------------------
+// ==========================================
+// CLIQUES NO MENU
+// ==========================================
+
 function cliqueMenu() {
     if (ratoSobreBotao()) {
         estado = "calibracao";
         return;
     }
 
-    // Página anterior
     if (
         mouseX >= setaEsq.x &&
         mouseX <= setaEsq.x + setaEsq.w &&
@@ -586,7 +584,6 @@ function cliqueMenu() {
         return;
     }
 
-    // Página seguinte
     if (
         mouseX >= setaDir.x &&
         mouseX <= setaDir.x + setaDir.w &&
@@ -599,7 +596,6 @@ function cliqueMenu() {
         return;
     }
 
-    // Abrir detalhes
     let inicio = paginaCartoes * cartoesPorPagina;
 
     for (let posicao = 0; posicao < cartoesPorPagina; posicao++) {
@@ -622,9 +618,10 @@ function cliqueMenu() {
 }
 
 
-// -- -------------------------------------------------------
-// -- REINICIAR ANIMAÇÃO
-// -- -------------------------------------------------------
+// ==========================================
+// REINICIAR ANIMAÇÃO
+// ==========================================
+
 function reiniciarAnimacaoCartoes() {
     inicioAnimacaoCartoes = millis();
 
@@ -635,52 +632,250 @@ function reiniciarAnimacaoCartoes() {
 }
 
 
-// -- -------------------------------------------------------
-// -- DETALHES DOS CARTÕES
-// -- -------------------------------------------------------
+// ==========================================
+// ABRIR DETALHES
+// ==========================================
+
 function mostrarDetalheCartao(i) {
     cartaoSelecionado = i;
     estado = "detalhe";
 }
 
+
+// ==========================================
+// PÁGINA MAIS INFORMAÇÃO
+// ==========================================
+
 function desenharDetalhe() {
     background(255, 247, 220);
 
+    if (
+        cartaoSelecionado < 0 ||
+        cartaoSelecionado >= cartoes.length
+    ) {
+        estado = "menu";
+        return;
+    }
+
+    let c = cartoes[cartaoSelecionado];
+
+    // Barra superior
+    noStroke();
     fill(40, 110, 50);
-    textAlign(CENTER);
+    rect(0, 0, width, 16);
+
+    // Título
     textFont(fonteBold);
+    textAlign(CENTER, CENTER);
     textSize(44);
+    fill(40, 110, 50);
 
     text(
-        cartoes[cartaoSelecionado].titulo.join(" "),
+        c.titulo.join(" "),
         width / 2,
-        150
+        105
     );
 
-    textAlign(LEFT);
+    // Subtítulo
     textFont(fonteNormal);
-    textSize(30);
+    textSize(25);
+    fill(90, 115, 75);
 
-    let linhas = cartoes[cartaoSelecionado].detalhe;
+    text(
+        "Pequenas ações fazem uma grande diferença.",
+        width / 2,
+        165
+    );
 
-    for (let j = 0; j < linhas.length; j++) {
+    // Separador
+    stroke(190, 210, 160);
+    strokeWeight(3);
+    line(300, 205, 1620, 205);
+    noStroke();
+
+    // Agrupar as linhas em recomendações completas
+    let paragrafos = [];
+    let frase = "";
+
+    for (let linha of c.detalhe) {
+        frase += (frase === "" ? "" : " ") + linha.trim();
+
+        if (/[.!?]$/.test(linha.trim())) {
+            paragrafos.push(frase);
+            frase = "";
+        }
+    }
+
+    if (frase !== "") {
+        paragrafos.push(frase);
+    }
+
+    // Painel central
+    let painelX = 250;
+    let painelY = 240;
+    let painelW = 1420;
+    let painelH = 525;
+
+    drawingContext.save();
+    drawingContext.shadowColor = "rgba(30, 70, 30, 0.12)";
+    drawingContext.shadowBlur = 20;
+    drawingContext.shadowOffsetY = 8;
+
+    fill(255, 253, 243);
+    stroke(220, 228, 200);
+    strokeWeight(2);
+
+    rect(
+        painelX,
+        painelY,
+        painelW,
+        painelH,
+        24
+    );
+
+    drawingContext.restore();
+
+    // Faixa verde lateral
+    noStroke();
+    fill(40, 130, 60);
+
+    rect(
+        painelX,
+        painelY + 25,
+        10,
+        painelH - 50,
+        5
+    );
+
+    // Título do painel
+    fill(40, 100, 45);
+    textFont(fonteBold);
+    textAlign(LEFT, CENTER);
+    textSize(29);
+
+    text(
+        "O que deves saber",
+        painelX + 55,
+        painelY + 55
+    );
+
+    // Calcular o espaço entre recomendações
+    let inicioY = painelY + 115;
+    let numeroLinhas = paragrafos.length;
+    let alturaLinha = numeroLinhas > 5 ? 65 : 60;
+    let alturaFaixa = 48;
+
+    let textoX = painelX + 105;
+
+    // Recomendações numeradas
+    for (let i = 0; i < numeroLinhas; i++) {
+        let centroY = inicioY + i * alturaLinha;
+
+        // Fundo da recomendação
+        fill(242, 247, 230);
+        noStroke();
+
+        rect(
+            painelX + 35,
+            centroY - alturaFaixa / 2,
+            painelW - 70,
+            alturaFaixa,
+            12
+        );
+
+        // Número centrado
+        fill(40, 130, 60);
+        circle(
+            painelX + 65,
+            centroY,
+            34
+        );
+
+        fill(255);
+        textFont(fonteBold);
+        textSize(19);
+        textAlign(CENTER, CENTER);
+
         text(
-            linhas[j],
-            300,
-            300 + j * 60
+            i + 1,
+            painelX + 65,
+            centroY
+        );
+
+        // TEXTO CORRIGIDO:
+        // Usar apenas x e y para centrar verticalmente
+        // o texto na mesma altura do centro da faixa.
+        fill(45, 75, 40);
+        textFont(fonteNormal);
+        textSize(25);
+        textAlign(LEFT, CENTER);
+
+        text(
+            paragrafos[i],
+            textoX,
+            centroY
         );
     }
 
-    fill(40, 110, 50);
-    textAlign(CENTER);
+    // Botão para voltar
+    let voltarX = width / 2 - 220;
+    let voltarY = 815;
+    let voltarW = 440;
+    let voltarH = 65;
+
+    let ratoSobreVoltar =
+        mouseX >= voltarX &&
+        mouseX <= voltarX + voltarW &&
+        mouseY >= voltarY &&
+        mouseY <= voltarY + voltarH;
+
+    fill(
+        ratoSobreVoltar
+            ? color(60, 155, 70)
+            : color(40, 120, 50)
+    );
+
+    noStroke();
+
+    rect(
+        voltarX,
+        voltarY,
+        voltarW,
+        voltarH,
+        16
+    );
+
+    fill(255);
     textFont(fonteBold);
+    textAlign(CENTER, CENTER);
     textSize(25);
 
     text(
-        "Clica para voltar à informação",
+        "←  Voltar à informação",
         width / 2,
-        850
+        voltarY + voltarH / 2
     );
 
-    textAlign(LEFT);
+    textAlign(LEFT, BASELINE);
+}
+
+
+// ==========================================
+// CLIQUE NO BOTÃO VOLTAR
+// ==========================================
+
+function cliqueDetalhe() {
+    let voltarX = width / 2 - 220;
+    let voltarY = 815;
+    let voltarW = 440;
+    let voltarH = 65;
+
+    if (
+        mouseX >= voltarX &&
+        mouseX <= voltarX + voltarW &&
+        mouseY >= voltarY &&
+        mouseY <= voltarY + voltarH
+    ) {
+        estado = "menu";
+    }
 }

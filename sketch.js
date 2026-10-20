@@ -1,4 +1,3 @@
-
 let NOME = "Igor José da Graça de Brito";
 let NUMERO = "34577";
 let CURSO = "ECGM";
@@ -12,8 +11,13 @@ let imgArvore, imgNuvem, imgSol;
 let imgchama, imgArvoreArder, imgArvoreQueimada;
 
 function preload() {
-    fonteNormal = loadFont("media/SourceSansPro/SourceSansPro-Regular.ttf");
-    fonteBold = loadFont("media/SourceSansPro/SourceSansPro-Bold.ttf");
+    fonteNormal = loadFont(
+        "media/SourceSansPro/SourceSansPro-Regular.ttf"
+    );
+
+    fonteBold = loadFont(
+        "media/SourceSansPro/SourceSansPro-Bold.ttf"
+    );
 
     imgArvore = loadImage("media/arvore.png");
     imgNuvem = loadImage("media/nuvem.png");
@@ -54,6 +58,7 @@ function draw() {
         default:
             estado = "menu";
             desenharMenu();
+            break;
     }
 
     desenharRodape();
@@ -70,6 +75,11 @@ function mousePressed() {
             break;
 
         case "detalhe":
+            cliqueDetalhe();
+            break;
+
+        case "execucao":
+        case "resultado":
             estado = "menu";
             break;
 
@@ -81,17 +91,25 @@ function mousePressed() {
 
 function desenharRodape() {
     noStroke();
+
     fill(255, 255, 255, 190);
     rect(0, height - 48, width, 48);
 
     fill(40, 90, 40);
+
     textFont(fonteNormal);
     textSize(24);
 
     textAlign(LEFT);
-    text(TEMA, 20, height - 14);
+
+    text(
+        TEMA,
+        20,
+        height - 14
+    );
 
     textAlign(RIGHT);
+
     text(
         NOME + " · " + NUMERO + " · " + CURSO,
         width - 20,
@@ -105,6 +123,7 @@ function desenharEmConstrucao() {
     background(255, 247, 220);
 
     fill(40, 90, 40);
+
     textAlign(CENTER);
     textFont(fonteBold);
     textSize(48);
@@ -117,7 +136,12 @@ function desenharEmConstrucao() {
 
     textFont(fonteNormal);
     textSize(28);
-    text("Clica para voltar ao menu", width / 2, height / 2 + 30);
+
+    text(
+        "Clica para voltar ao menu",
+        width / 2,
+        height / 2 + 30
+    );
 
     textAlign(LEFT);
 }
