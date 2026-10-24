@@ -590,6 +590,7 @@ function terminarCalibracao() {
 // ==========================================
 
 function cliqueCalibracao() {
+    console.log("CLIQUE NA CALIBRAÇÃO", estado, estadoCalibracao, mouseX, mouseY);
     // Voltar ao menu
     if (
         mouseX >= botaoVoltar.x &&
@@ -628,7 +629,7 @@ function cliqueCalibracao() {
         }
     }
 
-    // Botão continuar
+    // Botão continuar: vai para o jogo
     if (
         estadoCalibracao === "completo" &&
         mouseX >= botaoContinuar.x &&
@@ -636,7 +637,8 @@ function cliqueCalibracao() {
         mouseY >= botaoContinuar.y &&
         mouseY <= botaoContinuar.y + botaoContinuar.h
     ) {
-        estado = "detalhe";
+        estado = "execucao";
+        console.log("Continuar clicado. Estado:", estado);
         return;
     }
 }

@@ -1,0 +1,182 @@
+[
+  {
+    "pergunta": "O que deve fazer antes de realizar uma queimada?",
+    "opcoes": ["Acender o lume sem avisar", "Pedir autorização e cumprir as regras", "Escolher um dia de vento forte", "Deixar o lume sem vigilância"],
+    "correta": 1,
+    "explicacao": "Antes de realizar uma queimada deves pedir autorização e cumprir as regras de segurança para reduzir o risco de incêndio."
+  },
+  {
+    "pergunta": "Para que servem as faixas de gestão de combustível?",
+    "opcoes": ["Decorar a floresta", "Plantar mais árvores juntas", "Facilitar o acesso de turistas", "Travar o fogo, reduzindo a vegetação"],
+    "correta": 3,
+    "explicacao": "Ao reduzir a vegetação, estas faixas diminuem o combustível e ajudam a travar o avanço do fogo."
+  },
+  {
+    "pergunta": "O que deve fazer ao avistar um incêndio?",
+    "opcoes": ["Ligar 112 e afastar-se", "Ignorar e seguir caminho", "Tentar apagar sozinho", "Publicar nas redes sociais"],
+    "correta": 0,
+    "explicacao": "Deves ligar 112, indicar a localização e afastar-te do fogo e do fumo. Apagar sozinho é muito perigoso."
+  },
+  {
+    "pergunta": "Porque é importante limpar os matos à volta de casa?",
+    "opcoes": ["Atrai mais animais", "Faz mais sombra", "Reduz o combustível perto da habitação", "Não tem qualquer efeito"],
+    "correta": 2,
+    "explicacao": "Sem mato seco por perto, o fogo tem menos combustível para chegar à habitação."
+  },
+  {
+    "pergunta": "Qual destes comportamentos pode causar um incêndio?",
+    "opcoes": ["Levar o lixo para casa", "Usar o telemóvel", "Caminhar nos trilhos", "Deitar uma beata para o chão"],
+    "correta": 3,
+    "explicacao": "Uma beata acesa pode incendiar vegetação seca em segundos. Nunca deites cigarros para o chão."
+  },
+  {
+    "pergunta": "Qual é o número de emergência europeu, usado em Portugal?",
+    "opcoes": ["117", "112", "911", "999"],
+    "correta": 1,
+    "explicacao": "O 112 é o número de emergência europeu e funciona em Portugal para pedir bombeiros, polícia ou ambulância."
+  },
+  {
+    "pergunta": "Em que dias o risco de incêndio é maior?",
+    "opcoes": ["Dias frios e chuvosos", "Dias de nevoeiro", "Dias quentes, secos e com vento", "Dias de neve"],
+    "correta": 2,
+    "explicacao": "O calor, a falta de humidade e o vento secam a vegetação e fazem o fogo espalhar-se mais depressa."
+  },
+  {
+    "pergunta": "O que fazer se as autoridades mandarem sair de casa?",
+    "opcoes": ["Seguir as indicações das autoridades", "Esconder-te dentro de casa", "Ficar a ver o fogo de perto", "Esperar para ver o que acontece"],
+    "correta": 0,
+    "explicacao": "Deves seguir sempre as indicações das autoridades e sair logo que for pedido, sem arriscar."
+  },
+  {
+    "pergunta": "Que atitude ajuda a prevenir incêndios no campo?",
+    "opcoes": ["Fazer fogueiras em qualquer sítio", "Usar apenas locais autorizados para lume", "Fumar em zonas de mato seco", "Deixar lixo pelo caminho"],
+    "correta": 1,
+    "explicacao": "O lume só deve ser feito em locais autorizados e preparados para isso."
+  },
+  {
+    "pergunta": "O que são os matos que se devem limpar?",
+    "opcoes": ["Árvores de fruto", "Pedras do caminho", "Água acumulada", "Vegetação rasteira e seca que arde facilmente"],
+    "correta": 3,
+    "explicacao": "Os matos secos funcionam como combustível e espalham o fogo com facilidade."
+  },
+  {
+    "pergunta": "Quando é melhor limpar o mato?",
+    "opcoes": ["Antes do verão, longe da época de maior risco", "Na época de maior calor", "Só depois de um incêndio", "Nunca é preciso"],
+    "correta": 0,
+    "explicacao": "Limpar antes do verão reduz o combustível e evita usar máquinas na época de maior risco."
+  },
+  {
+    "pergunta": "Porque não se deve deixar lixo na floresta?",
+    "opcoes": ["Porque faz barulho", "Porque ocupa espaço", "Porque pode provocar ou alimentar incêndios", "Não há problema nenhum"],
+    "correta": 2,
+    "explicacao": "Alguns resíduos podem provocar fogo ou alimentá-lo, além de poluírem o ambiente."
+  },
+  {
+    "pergunta": "Que tipo de vegetação arde mais facilmente?",
+    "opcoes": ["Plantas verdes e húmidas", "Terreno encharcado", "Rocha nua", "Mato e folhas secas"],
+    "correta": 3,
+    "explicacao": "A vegetação seca perde humidade e acende-se com facilidade, alimentando o fogo."
+  },
+  {
+    "pergunta": "O que deves fazer com uma ponta de cigarro?",
+    "opcoes": ["Deitá-la pela janela do carro", "Apagá-la bem e levá-la com o lixo", "Deixá-la no mato", "Escondê-la entre as folhas secas"],
+    "correta": 1,
+    "explicacao": "Uma ponta de cigarro ainda acesa pode iniciar um incêndio. Apaga-a bem e leva-a contigo."
+  },
+  {
+    "pergunta": "Porque é que o vento torna o fogo mais perigoso?",
+    "opcoes": ["Arrefece a vegetação", "Molha o solo", "Leva faíscas e traz mais oxigénio às chamas", "Trava as chamas"],
+    "correta": 2,
+    "explicacao": "O vento aviva as chamas e pode levar faíscas para longe, criando novos focos de incêndio."
+  },
+  {
+    "pergunta": "Em que situação o fogo se propaga mais depressa?",
+    "opcoes": ["A subir uma encosta", "A descer uma encosta", "Em terreno plano e molhado", "Dentro de um rio"],
+    "correta": 0,
+    "explicacao": "Na subida, o calor aquece a vegetação à frente e o fogo avança muito mais depressa."
+  },
+  {
+    "pergunta": "O que fazer antes de sair de uma fogueira autorizada?",
+    "opcoes": ["Deixar as brasas a arder", "Apagá-la por completo com água", "Cobri-la com folhas secas", "Voltar mais tarde para a ver"],
+    "correta": 1,
+    "explicacao": "Só sais descansado quando as brasas estão frias ao toque. Apaga tudo com água e mexe as cinzas."
+  },
+  {
+    "pergunta": "Quando é mais perigoso fazer um churrasco no campo?",
+    "opcoes": ["Num dia de chuva", "Num local autorizado e com água por perto", "Num dia frio e húmido", "Num dia quente, seco e com vento"],
+    "correta": 3,
+    "explicacao": "Com calor, falta de humidade e vento, uma simples faísca pode iniciar um grande incêndio."
+  },
+  {
+    "pergunta": "Porque não usar roçadoras nas horas de maior calor?",
+    "opcoes": ["Uma faísca pode incendiar o mato seco", "Fazem muito barulho", "Gastam mais combustível", "O mato fica mais verde"],
+    "correta": 0,
+    "explicacao": "As máquinas podem fazer faíscas ao bater em pedras ou metal e acender o mato seco."
+  },
+  {
+    "pergunta": "Porque não estacionar o carro sobre erva seca?",
+    "opcoes": ["Os pneus gastam mais", "A erva estraga a pintura", "O escape quente pode incendiar a erva", "Atrai insetos"],
+    "correta": 2,
+    "explicacao": "O escape do carro fica muito quente e pode inflamar a erva seca que está por baixo."
+  },
+  {
+    "pergunta": "O que é um incêndio florestal?",
+    "opcoes": ["Uma queima de lixo em casa", "Uma fogueira controlada", "Um fogo-de-artifício", "Um fogo que se alastra por floresta ou mato"],
+    "correta": 3,
+    "explicacao": "É um fogo que se propaga sem controlo em florestas, matos ou terrenos agrícolas."
+  },
+  {
+    "pergunta": "Que informação dar ao ligar 112 por causa de um incêndio?",
+    "opcoes": ["Só o teu nome", "O local e se há pessoas em perigo", "A cor do fumo", "A tua opinião sobre a causa"],
+    "correta": 1,
+    "explicacao": "Indica onde está o fogo e se há pessoas ou casas em perigo, para a ajuda chegar mais depressa."
+  },
+  {
+    "pergunta": "O que ajuda a proteger uma casa do fogo?",
+    "opcoes": ["Encostar lenha à parede", "Deixar mato alto junto à porta", "Manter as caleiras sem folhas secas", "Guardar bidões de gasolina no quintal"],
+    "correta": 2,
+    "explicacao": "Folhas secas e lenha junto à casa funcionam como combustível. Mantém tudo limpo e afastado."
+  },
+  {
+    "pergunta": "Porque se diz que muitos incêndios têm origem humana?",
+    "opcoes": ["Resultam de descuidos ou ações das pessoas", "Os animais acendem fogueiras", "O sol acende sempre o mato", "A chuva provoca faíscas"],
+    "correta": 0,
+    "explicacao": "Queimadas mal feitas e pontas de cigarro estão na origem de muitos incêndios."
+  },
+  {
+    "pergunta": "Quem deve ligar 112 ao ver um fogo?",
+    "opcoes": ["Só os bombeiros", "Qualquer pessoa que o veja", "Apenas o dono do terreno", "Só quem for adulto"],
+    "correta": 1,
+    "explicacao": "Qualquer pessoa deve ligar 112 ao ver fogo, mesmo que ache que já alguém avisou."
+  },
+  {
+    "pergunta": "Que vantagem têm espécies autóctones, como o carvalho?",
+    "opcoes": ["Nunca ardem", "Crescem em poucos dias", "Não precisam de solo", "Ardem com menos facilidade que muitos pinhais"],
+    "correta": 3,
+    "explicacao": "Muitas folhosas autóctones retêm mais humidade e ardem com menos facilidade que pinhais densos."
+  },
+  {
+    "pergunta": "Como pode o pastoreio ajudar a prevenir incêndios?",
+    "opcoes": ["Os animais comem o mato e reduzem o combustível", "Os animais acendem lume", "Os animais plantam árvores", "Os animais secam o mato"],
+    "correta": 0,
+    "explicacao": "Ovelhas e cabras comem o mato, diminuindo o combustível que alimentaria um incêndio."
+  },
+  {
+    "pergunta": "O que é o fogo controlado feito por técnicos?",
+    "opcoes": ["Uma fogueira de verão", "Um incêndio provocado por vandalismo", "Fogo planeado para reduzir o mato em segurança", "Um fogo-de-artifício"],
+    "correta": 2,
+    "explicacao": "Técnicos preparados usam fogo planeado, em condições seguras, para reduzir o combustível acumulado."
+  },
+  {
+    "pergunta": "Qual destas atitudes é perigosa no verão, no campo?",
+    "opcoes": ["Levar o lixo contigo", "Seguir os avisos de risco", "Usar caminhos marcados", "Lançar foguetes junto à floresta"],
+    "correta": 3,
+    "explicacao": "Foguetes e fogo-de-artifício podem cair acesos na vegetação seca e provocar incêndios."
+  },
+  {
+    "pergunta": "O que significa risco máximo de incêndio?",
+    "opcoes": ["Não há perigo nenhum", "O fogo pode começar e alastrar muito depressa", "Só há risco à noite", "O fogo apaga-se sozinho"],
+    "correta": 1,
+    "explicacao": "Em risco máximo, uma faísca pode causar um grande incêndio. Evita qualquer atividade com lume."
+  }
+]
