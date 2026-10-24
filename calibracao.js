@@ -1,405 +1,593 @@
-
-/* -------------------------------------------------------
-   calibracao.js
-   Calibração do microfone com p5.js e p5.sound
-   Duração: 3 segundos
-------------------------------------------------------- */
+// ==========================================
+// CALIBRAÇÃO DO MICROFONE
+// Prevenção de Incêndios Florestais
+// ==========================================
 
 let microfone;
-
 let estadoCalibracao = "inicial";
 
 let inicioCalibracao = 0;
 let duracaoCalibracao = 3000;
 
 let nivelSom = 0;
-let somaNiveis = 0;
-let amostras = 0;
-let ruidoMedio = 0;
 let nivelMaximo = 0;
-let limiteRuido = 0.04;
+let somaNiveis = 0;
+let numeroAmostras = 0;
+let nivelMedio = 0;
+
+// -- Barra de volume em tempo real
+let nivelVisivel = 0;       // -- valor suavizado, só para desenhar a barra
+let ganhoBarraVolume = 6;   // -- amplifica o nível para a barra se notar (sobe se mexer pouco)
 
 let erroMicrofone = "";
 
+// -- Tamanho do texto dos botões (muda aqui para aumentar ou diminuir)
+let tamanhoTextoBotao = 48;
+let tamanhoTextoVoltar = 40;
+
 let botaoCalibrar = {
-    x: 710,
-    y: 610,
-    w: 500,
-    h: 90
+    x: 680,
+    y: 600,
+    w: 560,
+    h: 100
 };
 
 let botaoVoltar = {
     x: 60,
     y: 115,
-    w: 220,
-    h: 65
+    w: 260,
+    h: 80
 };
 
 let botaoContinuar = {
-    x: 760,
+    x: 740,
     y: 740,
-    w: 400,
-    h: 75
+    w: 440,
+    h: 90
 };
 
 
-// -------------------------------------------------------
-// Desenhar o ecrã
-// -------------------------------------------------------
+// ==========================================
+// INICIALIZAÇÃO
+// ==========================================
+
+function iniciarCalibracao() {
+    estadoCalibracao = "inicial";
+
+    nivelSom = 0;
+    nivelMaximo = 0;
+    somaNiveis = 0;
+    numeroAmostras = 0;
+    nivelMedio = 0;
+
+    erroMicrofone = "";
+}
+
+
+// ==========================================
+// DESENHAR ECRÃ DE CALIBRAÇÃO
+// ==========================================
 
 function desenharCalibracao() {
-    background(255, 247, 220);
+    background(245, 248, 239);
 
-    noStroke();
-    fill(40, 110, 50);
-
-    textAlign(CENTER);
-    textFont(fonteBold);
-    textSize(56);
-
-    text("Calibração do microfone", width / 2, 180);
+    desenharCabecalhoCalibracao();
 
     textFont(fonteNormal);
+    fill(65, 75, 60);
+    textAlign(CENTER, CENTER);
     textSize(29);
 
     text(
-        "Vamos preparar o microfone para o jogo!",
+        "Configura o microfone antes de começares.",
         width / 2,
         240
     );
 
-    fill(50, 90, 50);
+    desenharInstrucoesCalibracao();
+
+    switch (estadoCalibracao) {
+        case "inicial":
+            desenharEstadoInicial();
+            break;
+
+        case "prompt":
+            desenharEstadoPrompt();
+            break;
+
+        case "calibrando":
+            atualizarNivelMicrofone();
+            desenharEstadoCalibrando();
+            break;
+
+        case "completo":
+            desenharEstadoCompleto();
+            break;
+
+        case "erro":
+            desenharEstadoErro();
+            break;
+    }
+
+    // -- O botão Voltar aparece sempre (o sketch.js não o desenha)
+    desenharBotaoVoltarCalibracao();
+
+    textAlign(LEFT, BASELINE);
+}
+
+
+// ==========================================
+// CABEÇALHO
+// ==========================================
+
+function desenharCabecalhoCalibracao() {
+    noStroke();
+
+    fill(40, 90, 40);
+    textFont(fonteBold);
+    textAlign(CENTER, CENTER);
+    textSize(56);
+
+    text(
+        "Calibração do microfone",
+        width / 2,
+        165
+    );
+
+    fill(55, 105, 55);
+    rect(
+        width / 2 - 100,
+        205,
+        200,
+        5,
+        3
+    );
+}
+
+
+// ==========================================
+// INSTRUÇÕES
+// ==========================================
+
+function desenharInstrucoesCalibracao() {
+    textFont(fonteNormal);
     textSize(25);
+    textAlign(LEFT, CENTER);
+    fill(55, 65, 50);
 
     text(
         "1. Permite o acesso ao microfone.",
-        width / 2,
+        600,
         320
     );
 
     text(
-        "2. Mantém silêncio durante 3 segundos.",
-        width / 2,
+        "2. Mantém algum silêncio durante a calibração.",
+        600,
         365
     );
 
     text(
-        "3. O programa vai medir o ruído ambiente.",
-        width / 2,
+        "3. Aguarda até a calibração terminar.",
+        600,
         410
     );
 
-    // Estado inicial
-    if (estadoCalibracao === "inicial") {
-        textoCalibracao(
-            "Clica no botão para começar.",
-            540,
-            27
-        );
+    textAlign(CENTER, CENTER);
+}
 
-        desenharBotaoCalibracao(
-            "Calibrar microfone",
-            botaoCalibrar
-        );
-    }
 
-    // A iniciar o microfone
-    else if (estadoCalibracao === "a_pedir") {
-        textoCalibracao(
-            "A iniciar o microfone...",
-            530,
-            32
-        );
-    }
+// ==========================================
+// ESTADO INICIAL
+// ==========================================
 
-    // Calibração em curso
-    else if (estadoCalibracao === "a_calibrar") {
-        let tempoDecorrido = millis() - inicioCalibracao;
+function desenharEstadoInicial() {
+    fill(100, 110, 90);
+    textFont(fonteNormal);
+    textSize(25);
 
-        let restante = max(
-            0,
-            ceil((duracaoCalibracao - tempoDecorrido) / 1000)
-        );
-
-        // Ler o nível do microfone
-        if (microfone && microfone.enabled) {
-            nivelSom = microfone.getLevel();
-
-            if (Number.isFinite(nivelSom)) {
-                somaNiveis += nivelSom;
-                amostras++;
-
-                nivelMaximo = max(nivelMaximo, nivelSom);
-            }
-        }
-
-        fill(40, 110, 50);
-        textFont(fonteBold);
-        textSize(38);
-
-        text(
-            "A calibrar... " + restante + " s",
-            width / 2,
-            495
-        );
-
-        // Barra de nível
-        fill(215, 225, 205);
-        rect(510, 535, 900, 40, 12);
-
-        fill(40, 150, 65);
-        rect(
-            510,
-            535,
-            900 * constrain(nivelSom * 10, 0, 1),
-            40,
-            12
-        );
-
-        fill(40, 90, 40);
-        textFont(fonteNormal);
-        textSize(25);
-
-        text(
-            "Nível de som: " + nf(nivelSom, 1, 5),
-            width / 2,
-            620
-        );
-
-        text(
-            "Nível máximo: " + nf(nivelMaximo, 1, 5),
-            width / 2,
-            660
-        );
-
-        // Diagnóstico na consola, a cada meio segundo
-        if (frameCount % 15 === 0) {
-            let contexto = getAudioContext();
-
-            console.log(
-                "Microfone ativo:", microfone.enabled,
-                "| Nível:", nivelSom,
-                "| Contexto:", contexto.state
-            );
-        }
-
-        // Terminar após 3 segundos
-        if (tempoDecorrido >= duracaoCalibracao) {
-            ruidoMedio = amostras > 0
-                ? somaNiveis / amostras
-                : 0;
-
-            limiteRuido = ruidoMedio + 0.04;
-
-            if (amostras === 0) {
-                erroMicrofone =
-                    "Não foi possível recolher amostras de áudio.";
-
-                estadoCalibracao = "erro";
-            } else {
-                estadoCalibracao = "concluida";
-            }
-
-            console.log("Amostras:", amostras);
-            console.log("Ruído médio:", ruidoMedio);
-            console.log("Nível máximo:", nivelMaximo);
-            console.log("Limite:", limiteRuido);
-        }
-    }
-
-    // Calibração concluída
-    else if (estadoCalibracao === "concluida") {
-        fill(40, 130, 50);
-        textFont(fonteBold);
-        textSize(40);
-
-        text(
-            "Calibração concluída!",
-            width / 2,
-            490
-        );
-
-        fill(40, 90, 40);
-        textFont(fonteNormal);
-        textSize(25);
-
-        text(
-            "Ruído médio: " + nf(ruidoMedio, 1, 5),
-            width / 2,
-            545
-        );
-
-        text(
-            "Nível máximo: " + nf(nivelMaximo, 1, 5),
-            width / 2,
-            585
-        );
-
-        text(
-            "Limite de som: " + nf(limiteRuido, 1, 5),
-            width / 2,
-            625
-        );
-
-        desenharBotaoCalibracao(
-            "Calibrar novamente",
-            botaoCalibrar
-        );
-
-        desenharBotaoCalibracao(
-            "Continuar",
-            botaoContinuar
-        );
-    }
-
-    // Erro
-    else if (estadoCalibracao === "erro") {
-        fill(170, 40, 40);
-        textFont(fonteBold);
-        textSize(30);
-
-        text(
-            "Não foi possível calibrar o microfone.",
-            width / 2,
-            510
-        );
-
-        fill(70, 60, 50);
-        textFont(fonteNormal);
-        textSize(22);
-
-        text(
-            erroMicrofone,
-            width / 2,
-            555
-        );
-
-        text(
-            "Verifica as permissões e o dispositivo de entrada.",
-            width / 2,
-            590
-        );
-
-        desenharBotaoCalibracao(
-            "Tentar novamente",
-            botaoCalibrar
-        );
-    }
-
-    desenharBotaoCalibracao(
-        "← Voltar",
-        botaoVoltar
+    text(
+        "O microfone ainda não foi calibrado.",
+        width / 2,
+        500
     );
 
-    textAlign(LEFT);
+    desenharBotaoCalibracao(
+        "Calibrar microfone",
+        botaoCalibrar,
+        color(48, 120, 55),
+        color(63, 135, 70),
+        tamanhoTextoBotao
+    );
 }
 
 
-// -------------------------------------------------------
-// Texto centrado
-// -------------------------------------------------------
+// ==========================================
+// ESTADO DE PREPARAÇÃO
+// ==========================================
 
-function textoCalibracao(conteudo, y, tamanho) {
-    fill(40, 90, 40);
-    textAlign(CENTER);
+function desenharEstadoPrompt() {
+    fill(100, 110, 90);
     textFont(fonteNormal);
-    textSize(tamanho);
+    textSize(27);
 
-    text(conteudo, width / 2, y);
+    text(
+        "Prepara-te para iniciar a calibração.",
+        width / 2,
+        500
+    );
+
+    desenharBotaoCalibracao(
+        "Iniciar calibração",
+        botaoCalibrar,
+        color(48, 120, 55),
+        color(63, 135, 70),
+        tamanhoTextoBotao
+    );
 }
 
 
-// -------------------------------------------------------
-// Botões
-// -------------------------------------------------------
+// ==========================================
+// ESTADO DE CALIBRAÇÃO
+// ==========================================
 
-function desenharBotaoCalibracao(rotulo, b) {
-    let sobre =
+function desenharEstadoCalibrando() {
+    fill(55, 75, 50);
+    textFont(fonteBold);
+    textSize(34);
+
+    text(
+        "A calibrar o microfone...",
+        width / 2,
+        485
+    );
+
+    let tempoDecorrido = millis() - inicioCalibracao;
+
+    // -- progresso de 0 a 1
+    let progresso = tempoDecorrido / duracaoCalibracao;
+    if (progresso < 0) {
+        progresso = 0;
+    }
+    if (progresso > 1) {
+        progresso = 1;
+    }
+
+    let larguraBarra = 600;
+    let alturaBarra = 30;
+    let xBarra = (width - larguraBarra) / 2;
+    let yBarra = 535;
+
+    noStroke();
+
+    fill(220, 225, 215);
+    rect(
+        xBarra,
+        yBarra,
+        larguraBarra,
+        alturaBarra,
+        15
+    );
+
+    fill(48, 120, 55);
+    rect(
+        xBarra,
+        yBarra,
+        larguraBarra * progresso,
+        alturaBarra,
+        15
+    );
+
+    fill(75, 85, 65);
+    textFont(fonteNormal);
+    textSize(24);
+
+    text(
+        Math.round(progresso * 100) + "%",
+        width / 2,
+        585
+    );
+
+    // -- barra com o barulho que o microfone está a ouvir
+    desenharBarraVolume(xBarra, 665, larguraBarra, alturaBarra);
+
+    if (tempoDecorrido >= duracaoCalibracao) {
+        terminarCalibracao();
+    }
+}
+
+
+// ==========================================
+// BARRA DE VOLUME EM TEMPO REAL
+// ==========================================
+// x, y, w, h: posição e tamanho da barra
+
+function desenharBarraVolume(x, y, w, h) {
+    // -- nível atual (0 a 1), amplificado para se ver bem
+    let alvo = nivelSom * ganhoBarraVolume;
+    if (alvo > 1) {
+        alvo = 1;
+    }
+
+    // -- aproxima aos poucos para a barra não tremer
+    nivelVisivel = nivelVisivel + (alvo - nivelVisivel) * 0.3;
+
+    // -- pico (o valor mais alto até agora)
+    let pico = nivelMaximo * ganhoBarraVolume;
+    if (pico > 1) {
+        pico = 1;
+    }
+
+    // -- título
+    fill(55, 75, 50);
+    textFont(fonteBold);
+    textSize(26);
+    textAlign(CENTER, CENTER);
+    text("Volume do microfone", width / 2, y - 28);
+
+    // -- fundo da barra
+    noStroke();
+    fill(220, 225, 215);
+    rect(x, y, w, h, 15);
+
+    // -- barra: verde (baixo), amarelo (médio), vermelho (alto)
+    if (nivelVisivel < 0.5) {
+        fill(48, 120, 55);
+    } else if (nivelVisivel < 0.8) {
+        fill(230, 170, 40);
+    } else {
+        fill(200, 60, 45);
+    }
+    rect(x, y, w * nivelVisivel, h, 15);
+
+    // -- marca do pico
+    if (nivelMaximo > 0) {
+        stroke(40, 40, 40);
+        strokeWeight(3);
+        line(x + w * pico, y - 5, x + w * pico, y + h + 5);
+        noStroke();
+    }
+
+    // -- legenda
+    fill(100, 110, 90);
+    textFont(fonteNormal);
+    textSize(22);
+    text("A barra mostra o ruído ambiente. Mantém silêncio.", width / 2, y + h + 32);
+}
+
+
+// ==========================================
+// ESTADO CONCLUÍDO
+// ==========================================
+
+function desenharEstadoCompleto() {
+    fill(40, 125, 55);
+    textFont(fonteBold);
+    textSize(36);
+
+    text(
+        "Calibração concluída!",
+        width / 2,
+        480
+    );
+
+    fill(65, 75, 60);
+    textFont(fonteNormal);
+    textSize(25);
+
+    text(
+        "Nível médio do som: " + nivelMedio.toFixed(4),
+        width / 2,
+        530
+    );
+
+    text(
+        "Nível máximo detetado: " + nivelMaximo.toFixed(4),
+        width / 2,
+        570
+    );
+
+    desenharBotaoCalibracao(
+        "Continuar",
+        botaoContinuar,
+        color(48, 120, 55),
+        color(63, 135, 70),
+        tamanhoTextoBotao
+    );
+}
+
+
+// ==========================================
+// ESTADO DE ERRO
+// ==========================================
+
+function desenharEstadoErro() {
+    fill(180, 45, 35);
+    textFont(fonteBold);
+    textSize(32);
+
+    text(
+        "Não foi possível aceder ao microfone.",
+        width / 2,
+        480
+    );
+
+    fill(90, 55, 50);
+    textFont(fonteNormal);
+    textSize(22);
+
+    text(
+        erroMicrofone || "Verifica as permissões do navegador.",
+        width / 2,
+        530
+    );
+
+    desenharBotaoCalibracao(
+        "Tentar novamente",
+        botaoCalibrar,
+        color(48, 120, 55),
+        color(63, 135, 70),
+        tamanhoTextoBotao
+    );
+}
+
+
+// ==========================================
+// BOTÕES
+// ==========================================
+// rotulo: texto do botão
+// b: objeto com x, y, w, h
+// corNormal / corHover: cores do botão (sem rato / com rato por cima)
+// tamanho: tamanho do texto
+
+function desenharBotaoCalibracao(rotulo, b, corNormal, corHover, tamanho) {
+    let sobreBotao =
         mouseX >= b.x &&
         mouseX <= b.x + b.w &&
         mouseY >= b.y &&
         mouseY <= b.y + b.h;
 
-    stroke(30, 90, 40);
-    strokeWeight(3);
+    // Sombra
+    noStroke();
+    fill(0, 0, 0, 30);
 
-    fill(
-        sobre
-            ? color(60, 160, 70)
-            : color(40, 130, 50)
+    rect(
+        b.x,
+        b.y + 6,
+        b.w,
+        b.h,
+        16
     );
 
-    rect(b.x, b.y, b.w, b.h, 14);
+    // Fundo do botão
+    if (sobreBotao) {
+        fill(corHover);
+    } else {
+        fill(corNormal);
+    }
 
-    noStroke();
+    rect(
+        b.x,
+        b.y,
+        b.w,
+        b.h,
+        16
+    );
+
+    // Texto do botão
     fill(255);
-
-    textAlign(CENTER, CENTER);
     textFont(fonteBold);
-    textSize(29);
+    textSize(tamanho);
+    textAlign(CENTER, CENTER);
 
     text(
         rotulo,
         b.x + b.w / 2,
         b.y + b.h / 2
     );
-
-    textAlign(LEFT, BASELINE);
 }
 
 
-// -------------------------------------------------------
-// Iniciar calibração
-// -------------------------------------------------------
+// ==========================================
+// MICROFONE
+// ==========================================
 
-async function iniciarCalibracao() {
-    estadoCalibracao = "a_pedir";
-
-    nivelSom = 0;
-    somaNiveis = 0;
-    amostras = 0;
-    ruidoMedio = 0;
-    nivelMaximo = 0;
-    erroMicrofone = "";
-
+async function iniciarMicrofoneCalibracao() {
     try {
-        // Ativar o contexto de áudio após o clique
+        estadoCalibracao = "prompt";
+        erroMicrofone = "";
+
         await userStartAudio();
 
-        if (!microfone) {
-            microfone = new p5.AudioIn();
+        if (microfone) {
+            microfone.stop();
+            microfone = null;
         }
+
+        microfone = new p5.AudioIn();
 
         microfone.start(
             function () {
-                console.log("Microfone iniciado com sucesso.");
+                estadoCalibracao = "calibrando";
 
                 inicioCalibracao = millis();
-                estadoCalibracao = "a_calibrar";
+
+                nivelSom = 0;
+                nivelMaximo = 0;
+                somaNiveis = 0;
+                numeroAmostras = 0;
+                nivelMedio = 0;
             },
             function (erro) {
-                console.error("Erro no microfone:", erro);
-
                 erroMicrofone =
-                    "O navegador não conseguiu iniciar o microfone.";
+                    "Verifica as permissões de acesso ao microfone.";
 
                 estadoCalibracao = "erro";
+
+                console.error(
+                    "Erro ao iniciar o microfone:",
+                    erro
+                );
             }
         );
     } catch (erro) {
-        console.error("Erro ao iniciar o áudio:", erro);
-
         erroMicrofone =
-            "Erro ao ativar o áudio. Verifica as permissões do navegador.";
+            "Não foi possível iniciar o áudio.";
 
         estadoCalibracao = "erro";
+
+        console.error(
+            "Erro de áudio:",
+            erro
+        );
     }
 }
 
 
-// -------------------------------------------------------
-// Cliques
-// -------------------------------------------------------
+// ==========================================
+// ATUALIZAR NÍVEL DO MICROFONE
+// ==========================================
+
+function atualizarNivelMicrofone() {
+    if (
+        microfone &&
+        estadoCalibracao === "calibrando"
+    ) {
+        nivelSom = microfone.getLevel();
+
+        if (nivelSom > nivelMaximo) {
+            nivelMaximo = nivelSom;
+        }
+
+        somaNiveis += nivelSom;
+        numeroAmostras++;
+    }
+}
+
+
+// ==========================================
+// TERMINAR CALIBRAÇÃO
+// ==========================================
+
+function terminarCalibracao() {
+    if (numeroAmostras > 0) {
+        nivelMedio = somaNiveis / numeroAmostras;
+    } else {
+        nivelMedio = 0;
+    }
+
+    estadoCalibracao = "completo";
+
+    if (microfone) {
+        microfone.stop();
+        microfone = null;
+    }
+}
+
+
+// ==========================================
+// CLIQUES
+// ==========================================
 
 function cliqueCalibracao() {
     // Voltar ao menu
@@ -409,12 +597,17 @@ function cliqueCalibracao() {
         mouseY >= botaoVoltar.y &&
         mouseY <= botaoVoltar.y + botaoVoltar.h
     ) {
-        estadoCalibracao = "inicial";
+        if (microfone) {
+            microfone.stop();
+            microfone = null;
+        }
+
+        iniciarCalibracao();        // -- repõe o ecrã para a próxima vez
         estado = "menu";
         return;
     }
 
-    // Calibrar novamente ou tentar de novo
+    // Botão principal
     if (
         mouseX >= botaoCalibrar.x &&
         mouseX <= botaoCalibrar.x + botaoCalibrar.w &&
@@ -423,23 +616,42 @@ function cliqueCalibracao() {
     ) {
         if (
             estadoCalibracao === "inicial" ||
-            estadoCalibracao === "concluida" ||
             estadoCalibracao === "erro"
         ) {
-            iniciarCalibracao();
+            iniciarMicrofoneCalibracao();
+            return;
         }
 
-        return;
+        if (estadoCalibracao === "prompt") {
+            iniciarMicrofoneCalibracao();
+            return;
+        }
     }
 
-    // Continuar para o jogo
+    // Botão continuar
     if (
-        estadoCalibracao === "concluida" &&
+        estadoCalibracao === "completo" &&
         mouseX >= botaoContinuar.x &&
         mouseX <= botaoContinuar.x + botaoContinuar.w &&
         mouseY >= botaoContinuar.y &&
         mouseY <= botaoContinuar.y + botaoContinuar.h
     ) {
-        estado = "execucao";
+        estado = "detalhe";
+        return;
     }
+}
+
+
+// ==========================================
+// BOTÃO VOLTAR
+// ==========================================
+
+function desenharBotaoVoltarCalibracao() {
+    desenharBotaoCalibracao(
+        "← Voltar",
+        botaoVoltar,
+        color(85, 100, 80),
+        color(100, 115, 95),
+        tamanhoTextoVoltar
+    );
 }

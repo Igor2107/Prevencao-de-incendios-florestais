@@ -275,8 +275,8 @@ function desenharCabecalho() {
 
 function desenharBanner() {
     stroke(40, 110, 50);
-    strokeWeight(4);
-    fill(135, 206, 250);
+strokeWeight(2);
+fill(135, 206, 250);
 
     rect(bannerX, bannerY, bannerW, bannerH);
 
@@ -379,8 +379,8 @@ function desenharCartao(i, posicao) {
     drawingContext.shadowBlur = 18 * a.hover;
     drawingContext.shadowOffsetY = 5 * a.hover;
 
-    stroke(40, 110, 50);
-    strokeWeight(4);
+  stroke(40, 110, 50);
+strokeWeight(2);
 
     fill(
         ratoSobre
@@ -442,11 +442,12 @@ function desenharCartao(i, posicao) {
 // ==========================================
 
 function desenharSetas() {
-    desenharSeta(setaEsq, "‹", paginaCartoes > 0);
-    desenharSeta(setaDir, "›", paginaCartoes < 1);
+    desenharSeta(setaEsq, "esquerda", paginaCartoes > 0);
+    desenharSeta(setaDir, "direita", paginaCartoes < 1);
 }
 
-function desenharSeta(s, simbolo, ativa) {
+function desenharSeta(s, direcao, ativa) {
+    // Desenhar o quadrado
     noStroke();
 
     fill(
@@ -457,20 +458,56 @@ function desenharSeta(s, simbolo, ativa) {
 
     rect(s.x, s.y, s.w, s.h, 12);
 
-    fill(255);
-    textAlign(CENTER, CENTER);
-    textFont(fonteBold);
-    textSize(42);
+    // Centro exato do quadrado
+    let centroX = s.x + s.w / 2;
+    let centroY = s.y + s.h / 2;
 
-    text(
-        simbolo,
-        s.x + s.w / 2,
-        s.y + s.h / 2 - 2
-    );
+    // Desenhar a seta com linhas
+    stroke(255);
+    strokeWeight(4);
+    strokeCap(ROUND);
+    strokeJoin(ROUND);
+    noFill();
 
-    textAlign(LEFT, BASELINE);
+    let comprimento = 10;
+    let altura = 11;
+
+    if (direcao === "esquerda") {
+        line(
+            centroX + comprimento / 2,
+            centroY - altura,
+            centroX - comprimento / 2,
+            centroY
+        );
+
+        line(
+            centroX - comprimento / 2,
+            centroY,
+            centroX + comprimento / 2,
+            centroY + altura
+        );
+    } else {
+        line(
+            centroX - comprimento / 2,
+            centroY - altura,
+            centroX + comprimento / 2,
+            centroY
+        );
+
+        line(
+            centroX + comprimento / 2,
+            centroY,
+            centroX - comprimento / 2,
+            centroY + altura
+        );
+    }
+
+    // Repor o estado gráfico
+    strokeCap(ROUND);
+    strokeJoin(ROUND);
+    strokeWeight(1);
+    noStroke();
 }
-
 
 // ==========================================
 // INDICADOR DE PÁGINA
