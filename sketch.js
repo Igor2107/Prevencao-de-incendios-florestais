@@ -250,10 +250,8 @@ function mousePressed() {
         // .................................................
 
         case "resultado":
-
-            estado = "menu";
-            iniciarMenu();
-            break;
+    cliqueResultado();
+    break;
 
         // .................................................
         // ERRO AO INICIAR O QUIZ
@@ -426,4 +424,141 @@ function desenharEmConstrucao() {
     );
 
     textAlign(LEFT, BASELINE);
+}
+
+function desenharEmConstrucao() {
+    background(255, 247, 220);
+
+    // Título
+    textAlign(CENTER, CENTER);
+    textFont(fonteBold);
+    textSize(64);
+    fill(40, 100, 45);
+
+    if (resultadoJogo.vitoria) {
+        text("Parabéns! Salvou a floresta!", width / 2, 170);
+    } else {
+        text("Fim do jogo!", width / 2, 170);
+    }
+
+    // Mensagem
+    textFont(fonteNormal);
+    textSize(30);
+    fill(65, 75, 60);
+
+    if (resultadoJogo.vitoria) {
+        text(
+            "Demonstraste que sabes prevenir incêndios florestais.",
+            width / 2,
+            245
+        );
+    } else {
+        text(
+            "Tenta novamente para proteger a floresta!",
+            width / 2,
+            245
+        );
+    }
+
+    // Painel de resultados
+    let x = width / 2 - 350;
+    let y = 320;
+    let w = 700;
+    let h = 350;
+
+    noStroke();
+    fill(220, 235, 205);
+    rect(x, y, w, h, 24);
+
+    fill(40, 100, 45);
+    textFont(fonteBold);
+    textSize(36);
+    text("O teu resultado", width / 2, y + 50);
+
+    let total = resultadoJogo.total || perguntasJogo.length;
+    let certas = resultadoJogo.pontos;
+    let erradas = resultadoJogo.erros;
+    let tempo = Math.floor(resultadoJogo.tempo || 0);
+
+    textFont(fonteNormal);
+    textSize(30);
+    fill(50, 70, 45);
+
+    text(
+        "Respostas certas: " + certas + " / " + total,
+        width / 2,
+        y + 115
+    );
+
+    text(
+        "Respostas erradas: " + erradas,
+        width / 2,
+        y + 165
+    );
+
+    text(
+        "Tempo: " + Math.floor(tempo / 60) + " min " +
+        (tempo % 60) + " s",
+        width / 2,
+        y + 215
+    );
+
+    let percentagem = total > 0
+        ? Math.round(certas / total * 100)
+        : 0;
+
+    text(
+        "Pontuação: " + percentagem + "%",
+        width / 2,
+        y + 265
+    );
+
+    // Botão voltar ao menu
+    let bx = width / 2 - 180;
+    let by = 730;
+    let bw = 360;
+    let bh = 85;
+
+    if (
+        mouseX >= bx &&
+        mouseX <= bx + bw &&
+        mouseY >= by &&
+        mouseY <= by + bh
+    ) {
+        fill(60, 155, 70);
+    } else {
+        fill(40, 125, 50);
+    }
+
+    stroke(30, 90, 40);
+    strokeWeight(3);
+    rect(bx, by, bw, bh, 18);
+
+    noStroke();
+    fill(255);
+    textFont(fonteBold);
+    textSize(32);
+    text("Voltar ao menu", width / 2, by + bh / 2);
+
+    textAlign(LEFT);
+}
+
+
+function cliqueResultado() {
+    let bx = width / 2 - 180;
+    let by = 730;
+    let bw = 360;
+    let bh = 85;
+
+    if (
+        mouseX >= bx &&
+        mouseX <= bx + bw &&
+        mouseY >= by &&
+        mouseY <= by + bh
+    ) {
+        pararMicJogo();
+
+        estado = "menu";
+        iniciarMenu();
+    }
 }
