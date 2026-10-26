@@ -1,22 +1,26 @@
 // ==========================================
 // execucao.js - Quiz, floresta e sopro
 // ==========================================
+//
+// Este ficheiro tem a configuração, o carregamento de dados e sons,
+// os cliques e o desenho do ecrã de execução.
+// A lógica do jogo está nas classes (um ficheiro por classe):
+//   pergunta.js  - Pergunta
+//   microfone.js - Microfone
+//   fogo.js      - Fogo
+//   jogo.js      - Jogo
+// As funções desenhar...() só desenham o estado do objeto "jogo".
 
-let perguntasJSON;
-let perguntasJogo = [];
-let perguntasPorJogo = 5;
+// ------------------------------------------
+// Dados e configuração
+// ------------------------------------------
 
-let subestadoJogo = "pergunta";
-let indicePerguntaJogo = 0;
-let escolhidaJogo = -1;
-let acertouJogo = false;
-let pontosJogo = 0;
-let errosJogo = 0;
-let estagioFogo = 0;
-let inicioJogo = 0;
-let inicioFimJogo = 0;
-let saudeVisivelJogo = 100;
+let perguntasJSON;          // dados em bruto, lidos do perguntas.json
+let perguntasPorJogo = 5;   // quantas perguntas tem cada partida
 
+let jogo = null;            // partida atual (objeto da classe Jogo)
+
+// Resultado da última partida (lido pelo ecrã de resultados em sketch.js)
 let resultadoJogo = {
     vitoria: false,
     pontos: 0,
@@ -25,33 +29,29 @@ let resultadoJogo = {
     total: 0
 };
 
-let micJogo;
-let nivelJogo = 0;
-let soproAtivo = false;
-let limiarSoproMax = 0.1;
-let limiarSoproMin = 0.06;
-let fogosAcesos = 0;
-let apagarProgresso = 0;
-let inicioSopro = 0;
-let tempoLimiteSopro = 5000;
-let duracaoSopro = 1.5;
-let dificuldadePorFogo = 0.5;
+// Configuração do desafio de sopro
+let tempoLimiteSopro = 5000;   // ms para apagar o fogo
+let duracaoSopro = 1.5;        // segundos de sopro contínuo para apagar
+let dificuldadePorFogo = 0.5;  // aumento do limiar por cada novo fogo
 
-let nuvensJogo = [];
-let alturasArvoresJogo = [250, 290, 260, 300, 255];
-
+// Posição e tamanho do cenário e do painel
 let cenaX = 60;
 let cenaY = 130;
 let cenaW = 860;
 let cenaH = 620;
 let painelJogoX = 980;
 let painelJogoW = 880;
+
+let alturasArvoresJogo = [250, 290, 260, 300, 255];
+
+// Sons
 let somCorreto;
 let somErrado;
 let somFimJogo;
 
+
 // ==========================================
-// CARREGAR PERGUNTAS
+// CARREGAR PERGUNTAS E SONS
 // ==========================================
 
 function preloadExecucao() {
@@ -120,64 +120,12 @@ function iniciarExecucao() {
         );
     }
 
-    let todas = perguntasJSON.slice();
-
-    // Baralhar perguntas
-    for (let i = todas.length - 1; i > 0; i--) {
-        let j = Math.floor(random(i + 1));
-        let temp = todas[i];
-        todas[i] = todas[j];
-        todas[j] = temp;
+    // Garante que o microfone da partida anterior fica parado
+    if (jogo) {
+        jogo.parar();
     }
 
-    // Selecionar até cinco perguntas
-    perguntasJogo = todas.slice(
-        0,
-        Math.min(perguntasPorJogo, todas.length)
-    );
-
-    // Reiniciar estado
-    subestadoJogo = "pergunta";
-    indicePerguntaJogo = 0;
-    escolhidaJogo = -1;
-    acertouJogo = false;
-    pontosJogo = 0;
-    errosJogo = 0;
-    estagioFogo = 0;
-    saudeVisivelJogo = 100;
-    fogosAcesos = 0;
-    soproAtivo = false;
-    apagarProgresso = 0;
-    nivelJogo = 0;
-    inicioJogo = millis();
-
-    // Criar nuvens
-    nuvensJogo = [];
-
-    for (let i = 0; i < 3; i++) {
-        nuvensJogo.push({
-            x: random(cenaX + 120, cenaX + cenaW - 360),
-            y: random(cenaY + 20, cenaY + 80),
-            tam: random(110, 170)
-        });
-    }
-
-    // Iniciar microfone do jogo
-    pararMicJogo();
-    micJogo = new p5.AudioIn();
-    micJogo.start();
-}
-
-
-// ==========================================
-// PARAR MICROFONE
-// ==========================================
-
-function pararMicJogo() {
-    if (micJogo) {
-        micJogo.stop();
-        micJogo = null;
-    }
+    jogo = new Jogo(perguntasJSON);
 }
 
 
@@ -188,177 +136,26 @@ function pararMicJogo() {
 function desenharExecucao() {
     background(255, 247, 220);
 
-    if (subestadoJogo === "sopro") {
-        atualizarSoproJogo();
-    }
+    jogo.atualizar();
 
     desenharCabecalhoJogo();
     desenharCenaJogo();
     desenharEstadoFlorestaJogo();
 
-    if (subestadoJogo === "pergunta") {
+    if (jogo.subestado === "pergunta") {
         desenharPerguntaJogo();
-    } else if (subestadoJogo === "feedback") {
+    } else if (jogo.subestado === "feedback") {
         desenharPerguntaJogo();
         desenharFeedbackJogo();
-    } else if (subestadoJogo === "sopro") {
+    } else if (jogo.subestado === "sopro") {
         desenharSoproJogo();
-    } else if (subestadoJogo === "fim") {
+    } else if (jogo.subestado === "fim") {
         desenharFimJogo();
     }
 
     textAlign(LEFT);
 }
 
-
-// ==========================================
-// RESPONDER À PERGUNTA
-// ==========================================
-
-function responderJogo(i) {
-    let p = perguntasJogo[indicePerguntaJogo];
-    escolhidaJogo = i;
-
-    if (i === p.correta) {
-        acertouJogo = true;
-        pontosJogo++;
-
-        if (somCorreto && somCorreto.isLoaded()) {
-            somCorreto.play();
-        }
-
-        subestadoJogo = "feedback";
-    } else {
-        acertouJogo = false;
-        errosJogo++;
-
-        if (somErrado && somErrado.isLoaded()) {
-            somErrado.play();
-        }
-
-        if (estagioFogo === 0) {
-            estagioFogo = 1;
-            subestadoJogo = "feedback";
-        } else {
-            estagioFogo = 2;
-            iniciarSoproJogo();
-        }
-    }
-}
-
-
-// ==========================================
-// INICIAR DESAFIO DE SOPRO
-// ==========================================
-
-function iniciarSoproJogo() {
-    fogosAcesos++;
-
-    let base = nivelMaximo * 3;
-
-    if (base < 0.05) {
-        base = 0.05;
-    }
-
-    let multiplicador =
-        1 + dificuldadePorFogo * (fogosAcesos - 1);
-
-    limiarSoproMax = base * multiplicador;
-    limiarSoproMin = limiarSoproMax * 0.6;
-
-    soproAtivo = false;
-    apagarProgresso = 0;
-    inicioSopro = millis();
-    subestadoJogo = "sopro";
-}
-
-
-// ==========================================
-// ATUALIZAR SOPRO
-// ==========================================
-
-function atualizarSoproJogo() {
-    if (micJogo) {
-        nivelJogo = micJogo.getLevel();
-    } else {
-        nivelJogo = 0;
-    }
-
-    if (!soproAtivo && nivelJogo > limiarSoproMax) {
-        soproAtivo = true;
-    }
-
-    if (soproAtivo && nivelJogo < limiarSoproMin) {
-        soproAtivo = false;
-    }
-
-    if (soproAtivo) {
-        apagarProgresso += 1 / (30 * duracaoSopro);
-    } else {
-        apagarProgresso -= 0.01;
-    }
-
-    if (apagarProgresso < 0) {
-        apagarProgresso = 0;
-    }
-
-    if (apagarProgresso > 1) {
-        apagarProgresso = 1;
-    }
-
-    if (apagarProgresso >= 1) {
-        estagioFogo = 1;
-        soproAtivo = false;
-        proximaPerguntaJogo();
-    } else if (millis() - inicioSopro > tempoLimiteSopro) {
-        estagioFogo = 3;
-        terminarJogo(false);
-    }
-}
-
-
-// ==========================================
-// PRÓXIMA PERGUNTA
-// ==========================================
-
-function proximaPerguntaJogo() {
-    indicePerguntaJogo++;
-    escolhidaJogo = -1;
-
-    if (indicePerguntaJogo >= perguntasJogo.length) {
-        terminarJogo(true);
-    } else {
-        subestadoJogo = "pergunta";
-    }
-}
-
-
-// ==========================================
-// TERMINAR JOGO
-// ==========================================
-
-function terminarJogo(vitoria) {
-    resultadoJogo = {
-        vitoria: vitoria,
-        pontos: pontosJogo,
-        erros: errosJogo,
-        tempo: (millis() - inicioJogo) / 1000,
-        total: perguntasJogo.length
-    };
-
-    pararMicJogo();
-
-    if (somFimJogo && somFimJogo.isLoaded()) {
-        somFimJogo.play();
-    }
-
-    if (vitoria) {
-        estado = "resultado";
-    } else {
-        subestadoJogo = "fim";
-        inicioFimJogo = millis();
-    }
-}
 
 // ==========================================
 // CLIQUES
@@ -385,16 +182,20 @@ function ratoSobreProximoJogo() {
 }
 
 function cliqueExecucao() {
-    if (subestadoJogo === "pergunta") {
+    if (!jogo) {
+        return;
+    }
+
+    if (jogo.subestado === "pergunta") {
         for (let i = 0; i < 4; i++) {
             if (ratoSobreOpcaoJogo(i)) {
-                responderJogo(i);
+                jogo.responder(i);
                 return;
             }
         }
-    } else if (subestadoJogo === "feedback") {
+    } else if (jogo.subestado === "feedback") {
         if (ratoSobreProximoJogo()) {
-            proximaPerguntaJogo();
+            jogo.proximaPergunta();
         }
     }
 }
@@ -405,8 +206,8 @@ function cliqueExecucao() {
 // ==========================================
 
 function desenharCabecalhoJogo() {
-    let total = perguntasJogo.length;
-    let numero = indicePerguntaJogo + 1;
+    let total = jogo.total;
+    let numero = jogo.indice + 1;
 
     if (numero > total) {
         numero = total;
@@ -419,13 +220,13 @@ function desenharCabecalhoJogo() {
     textSize(40);
     text("Pergunta " + numero + " de " + total, 60, 75);
 
-    let segundos = Math.floor((millis() - inicioJogo) / 1000);
+    let segundos = Math.floor((millis() - jogo.inicio) / 1000);
 
     textAlign(RIGHT);
     textFont(fonteNormal);
     textSize(34);
     text(
-        "Pontos: " + pontosJogo + "      Tempo: " + segundos + " s",
+        "Pontos: " + jogo.pontos + "      Tempo: " + segundos + " s",
         width - 60,
         75
     );
@@ -433,9 +234,9 @@ function desenharCabecalhoJogo() {
     textAlign(LEFT);
 
     // Barra de progresso
-    let feitas = indicePerguntaJogo;
+    let feitas = jogo.indice;
 
-    if (subestadoJogo === "feedback") {
+    if (jogo.subestado === "feedback") {
         feitas++;
     }
 
@@ -455,11 +256,11 @@ function desenharCenaJogo() {
     stroke(40, 110, 50);
     strokeWeight(4);
 
-    if (estagioFogo === 0) {
+    if (jogo.fogo.estagio === 0) {
         fill(135, 206, 250);
-    } else if (estagioFogo === 1) {
+    } else if (jogo.fogo.estagio === 1) {
         fill(175, 200, 220);
-    } else if (estagioFogo === 2) {
+    } else if (jogo.fogo.estagio === 2) {
         fill(205, 155, 125);
     } else {
         fill(110, 110, 120);
@@ -477,8 +278,8 @@ function desenharCenaJogo() {
         120
     );
 
-    for (let i = 0; i < nuvensJogo.length; i++) {
-        let n = nuvensJogo[i];
+    for (let i = 0; i < jogo.nuvens.length; i++) {
+        let n = jogo.nuvens[i];
 
         image(
             imgNuvem,
@@ -492,7 +293,7 @@ function desenharCenaJogo() {
     // Chão
     let chaoY = cenaY + cenaH - 110;
 
-    if (estagioFogo === 3) {
+    if (jogo.fogo.estagio === 3) {
         fill(90, 80, 60);
     } else {
         fill(120, 190, 90);
@@ -510,9 +311,9 @@ function desenharCenaJogo() {
 
         let img = imgArvore;
 
-        if (estagioFogo === 3) {
+        if (jogo.fogo.estagio === 3) {
             img = imgArvoreQueimada;
-        } else if (estagioFogo === 2 && i >= 3) {
+        } else if (jogo.fogo.estagio === 2 && i >= 3) {
             img = imgArvoreArder;
         }
 
@@ -520,10 +321,10 @@ function desenharCenaJogo() {
     }
 
     // Chamas
-    if (estagioFogo === 1) {
+    if (jogo.fogo.estagio === 1) {
         desenharChamaJogo(cenaX + cenaW - 50, base, 130);
         desenharChamaJogo(cenaX + cenaW - 110, base, 100);
-    } else if (estagioFogo === 2) {
+    } else if (jogo.fogo.estagio === 2) {
         desenharChamaJogo(cenaX + 515, base, 170);
         desenharChamaJogo(cenaX + 650, base, 190);
         desenharChamaJogo(cenaX + 760, base, 160);
@@ -559,21 +360,21 @@ function desenharEstadoFlorestaJogo() {
     let corBarra = color(48, 120, 55);
     let legenda = "Floresta segura";
 
-    if (estagioFogo === 1) {
+    if (jogo.fogo.estagio === 1) {
         alvo = 66;
         corBarra = color(230, 170, 40);
         legenda = "O fogo aproxima-se da floresta";
-    } else if (estagioFogo === 2) {
+    } else if (jogo.fogo.estagio === 2) {
         alvo = 33;
         corBarra = color(230, 100, 30);
         legenda = "O fogo pegou na floresta!";
-    } else if (estagioFogo === 3) {
+    } else if (jogo.fogo.estagio === 3) {
         alvo = 0;
         corBarra = color(160, 40, 35);
         legenda = "A floresta ficou toda queimada";
     }
 
-    saudeVisivelJogo += (alvo - saudeVisivelJogo) * 0.1;
+    jogo.fogo.saudeVisivel += (alvo - jogo.fogo.saudeVisivel) * 0.1;
 
     fill(40, 110, 50);
     textAlign(LEFT);
@@ -591,7 +392,7 @@ function desenharEstadoFlorestaJogo() {
     rect(
         cenaX,
         805,
-        cenaW * saudeVisivelJogo / 100,
+        cenaW * jogo.fogo.saudeVisivel / 100,
         30
     );
 
@@ -601,7 +402,7 @@ function desenharEstadoFlorestaJogo() {
     text(legenda, cenaX, 880);
 
     textSize(26);
-    text("Erros: " + errosJogo, cenaX, 925);
+    text("Erros: " + jogo.erros, cenaX, 925);
 }
 
 
@@ -640,8 +441,8 @@ function jogoQuebrarTexto(t, maxCaracteres) {
 // ==========================================
 
 function desenharPerguntaJogo() {
-    let p = perguntasJogo[indicePerguntaJogo];
-    let emFeedback = subestadoJogo === "feedback";
+    let p = jogo.perguntaAtual;
+    let emFeedback = jogo.subestado === "feedback";
 
     // Pergunta
     noStroke();
@@ -650,7 +451,7 @@ function desenharPerguntaJogo() {
     textFont(fonteBold);
     textSize(40);
 
-    let linhas = jogoQuebrarTexto(p.pergunta, 44);
+    let linhas = jogoQuebrarTexto(p.enunciado, 44);
 
     for (let i = 0; i < linhas.length; i++) {
         text(linhas[i], painelJogoX, 195 + i * 48);
@@ -674,7 +475,7 @@ function desenharPerguntaJogo() {
             if (i === p.correta) {
                 fundo = color(168, 214, 158);
                 corTexto = color(30, 80, 35);
-            } else if (i === escolhidaJogo) {
+            } else if (i === jogo.escolhida) {
                 fundo = color(225, 50, 45);
                 corTexto = color(255);
             } else {
@@ -725,12 +526,12 @@ function desenharPerguntaJogo() {
 // ==========================================
 
 function desenharFeedbackJogo() {
-    let p = perguntasJogo[indicePerguntaJogo];
+    let p = jogo.perguntaAtual;
 
     stroke(40, 90, 40);
     strokeWeight(3);
 
-    if (acertouJogo) {
+    if (jogo.acertou) {
         fill(168, 214, 158);
     } else {
         fill(255, 130, 90);
@@ -743,7 +544,7 @@ function desenharFeedbackJogo() {
     let corTexto = color(30, 80, 35);
     let titulo = "Resposta certa!";
 
-    if (!acertouJogo) {
+    if (!jogo.acertou) {
         corTexto = color(60, 15, 10);
         titulo = "Resposta errada! O fogo aproxima-se!";
     }
@@ -771,7 +572,7 @@ function desenharFeedbackJogo() {
     // Botão para avançar
     let rotulo = "Próxima pergunta";
 
-    if (indicePerguntaJogo === perguntasJogo.length - 1) {
+    if (jogo.indice === jogo.total - 1) {
         rotulo = "Ver resultado";
     }
 
@@ -808,13 +609,13 @@ function desenharFeedbackJogo() {
 
 function desenharSoproJogo() {
     if (
-        indicePerguntaJogo < 0 ||
-        indicePerguntaJogo >= perguntasJogo.length
+        jogo.indice < 0 ||
+        jogo.indice >= jogo.total
     ) {
         return;
     }
 
-    let p = perguntasJogo[indicePerguntaJogo];
+    let p = jogo.perguntaAtual;
 
     if (!p || !Array.isArray(p.opcoes)) {
         return;
@@ -893,13 +694,13 @@ function desenharSoproJogo() {
     rect(
         painelJogoX,
         450,
-        painelJogoW * apagarProgresso,
+        painelJogoW * jogo.fogo.progresso,
         40
     );
 
     // Barra do sopro
-    let escala = limiarSoproMax * 1.8;
-    let nivelDesenho = nivelJogo / escala;
+    let escala = jogo.fogo.limiarMax * 1.8;
+    let nivelDesenho = jogo.microfone.nivel / escala;
 
     if (nivelDesenho > 1) {
         nivelDesenho = 1;
@@ -907,11 +708,11 @@ function desenharSoproJogo() {
 
     let xMax =
         painelJogoX +
-        painelJogoW * (limiarSoproMax / escala);
+        painelJogoW * (jogo.fogo.limiarMax / escala);
 
     let xMin =
         painelJogoX +
-        painelJogoW * (limiarSoproMin / escala);
+        painelJogoW * (jogo.fogo.limiarMin / escala);
 
     fill(30, 90, 40);
     textFont(fonteBold);
@@ -936,7 +737,7 @@ function desenharSoproJogo() {
 
     noStroke();
 
-    if (soproAtivo) {
+    if (jogo.fogo.soproAtivo) {
         fill(48, 120, 55);
     } else {
         fill(150, 160, 150);
@@ -983,7 +784,7 @@ function desenharSoproJogo() {
 
     // Tempo restante
     let restante =
-        (tempoLimiteSopro - (millis() - inicioSopro)) / 1000;
+        (tempoLimiteSopro - (millis() - jogo.fogo.inicioSopro)) / 1000;
 
     if (restante < 0) {
         restante = 0;
@@ -1024,7 +825,7 @@ function desenharSoproJogo() {
     textSize(26);
 
     text(
-        "Vezes que o fogo pegou: " + fogosAcesos,
+        "Vezes que o fogo pegou: " + jogo.fogo.fogosAcesos,
         painelJogoX,
         800
     );
@@ -1058,7 +859,7 @@ function desenharFimJogo() {
         370
     );
 
-    if (millis() - inicioFimJogo > 3000) {
+    if (millis() - jogo.inicioFim > 3000) {
         estado = "resultado";
     }
 }
