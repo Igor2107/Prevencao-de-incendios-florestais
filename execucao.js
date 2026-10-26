@@ -1,4 +1,3 @@
-
 // ==========================================
 // execucao.js - Quiz, floresta e sopro
 // ==========================================
@@ -47,7 +46,9 @@ let cenaW = 860;
 let cenaH = 620;
 let painelJogoX = 980;
 let painelJogoW = 880;
-
+let somCorreto;
+let somErrado;
+let somFimJogo;
 
 // ==========================================
 // CARREGAR PERGUNTAS
@@ -56,8 +57,12 @@ let painelJogoW = 880;
 function preloadExecucao() {
     perguntasJSON = null;
 
+    somCorreto = loadSound("media/correto.wav");
+    somErrado = loadSound("media/errado.wav");
+    somFimJogo = loadSound("media/fim_jogo.wav");
+
     loadJSON(
-        "./perguntas.json",
+        "perguntas.json",
         function (dados) {
             if (Array.isArray(dados)) {
                 perguntasJSON = dados;
@@ -86,23 +91,19 @@ function preloadExecucao() {
 
             if (!Array.isArray(perguntasJSON)) {
                 console.error(
-                    "perguntas.json foi carregado, mas não contém uma lista de perguntas.",
+                    "perguntas.json não contém uma lista de perguntas.",
                     dados
                 );
-                return;
+            } else {
+                console.log(
+                    "Perguntas carregadas com sucesso:",
+                    perguntasJSON.length
+                );
             }
-
-            console.log(
-                "Perguntas carregadas com sucesso:",
-                perguntasJSON.length
-            );
         },
         function (erro) {
             perguntasJSON = null;
-            console.error(
-                "Não foi possível carregar ./perguntas.json. Confirma se está na mesma pasta do index.html.",
-                erro
-            );
+            console.error("Erro ao carregar perguntas.json:", erro);
         }
     );
 }
@@ -221,10 +222,19 @@ function responderJogo(i) {
     if (i === p.correta) {
         acertouJogo = true;
         pontosJogo++;
+
+        if (somCorreto && somCorreto.isLoaded()) {
+            somCorreto.play();
+        }
+
         subestadoJogo = "feedback";
     } else {
         acertouJogo = false;
         errosJogo++;
+
+        if (somErrado && somErrado.isLoaded()) {
+            somErrado.play();
+        }
 
         if (estagioFogo === 0) {
             estagioFogo = 1;
@@ -337,6 +347,10 @@ function terminarJogo(vitoria) {
     };
 
     pararMicJogo();
+
+    if (somFimJogo && somFimJogo.isLoaded()) {
+        somFimJogo.play();
+    }
 
     if (vitoria) {
         estado = "resultado";
@@ -705,6 +719,7 @@ function desenharPerguntaJogo() {
     }
 }
 
+
 // ==========================================
 // FEEDBACK DA RESPOSTA
 // ==========================================
@@ -792,7 +807,19 @@ function desenharFeedbackJogo() {
 // ==========================================
 
 function desenharSoproJogo() {
+    if (
+        indicePerguntaJogo < 0 ||
+        indicePerguntaJogo >= perguntasJogo.length
+    ) {
+        return;
+    }
+
     let p = perguntasJogo[indicePerguntaJogo];
+
+    if (!p || !Array.isArray(p.opcoes)) {
+        return;
+    }
+
     let letras = ["A", "B", "C", "D"];
 
     // Aviso

@@ -399,32 +399,7 @@ function desenharRodape() {
 // ECRÃ DE RESULTADOS PROVISÓRIO
 // ---------------------------------------------------------
 
-function desenharEmConstrucao() {
-    background(255, 247, 220);
 
-    fill(40, 90, 40);
-    textAlign(CENTER, CENTER);
-
-    textFont(fonteBold);
-    textSize(48);
-
-    text(
-        'Ecrã "' + estado + '" em construção',
-        width / 2,
-        height / 2 - 30
-    );
-
-    textFont(fonteNormal);
-    textSize(28);
-
-    text(
-        "Clica para voltar ao menu",
-        width / 2,
-        height / 2 + 30
-    );
-
-    textAlign(LEFT, BASELINE);
-}
 
 function desenharEmConstrucao() {
     background(255, 247, 220);
@@ -436,7 +411,11 @@ function desenharEmConstrucao() {
     fill(40, 100, 45);
 
     if (resultadoJogo.vitoria) {
-        text("Parabéns! Salvou a floresta!", width / 2, 170);
+        text(
+            "Parabéns! Salvaste a floresta!",
+            width / 2,
+            170
+        );
     } else {
         text("Fim do jogo!", width / 2, 170);
     }
@@ -447,11 +426,19 @@ function desenharEmConstrucao() {
     fill(65, 75, 60);
 
     if (resultadoJogo.vitoria) {
-        text(
-            "Demonstraste que sabes prevenir incêndios florestais.",
-            width / 2,
-            245
-        );
+        if (resultadoJogo.erros > 3) {
+            text(
+                "Salvaste a floresta, mas devias estudar mais sobre o assunto.",
+                width / 2,
+                245
+            );
+        } else {
+            text(
+                "Demonstraste que sabes prevenir incêndios florestais.",
+                width / 2,
+                245
+            );
+        }
     } else {
         text(
             "Tenta novamente para proteger a floresta!",
@@ -460,6 +447,9 @@ function desenharEmConstrucao() {
         );
     }
 
+    // Resultado
+    textSize(30);
+    fill(65, 75, 60);
     // Painel de resultados
     let x = width / 2 - 350;
     let y = 320;
