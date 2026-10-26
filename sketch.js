@@ -12,7 +12,7 @@
 let NOME = "Igor José da Graça de Brito";
 let NUMERO = "34577";
 let CURSO = "ECGM";
-let TEMA = "Prevenção de Incêndios Florestais";
+let TEMA = "Forest Fire Prevention";
 
 // ---------------------------------------------------------
 // Estado da aplicação
